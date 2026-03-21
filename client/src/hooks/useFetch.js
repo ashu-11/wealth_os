@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_BASE = '/api';
+/** Local dev: Vite proxies /api → backend. Production (Vercel): set VITE_API_URL to your API origin, e.g. https://your-app.onrender.com */
+function getApiBase() {
+  const origin = import.meta.env.VITE_API_URL?.trim();
+  if (origin) {
+    return `${origin.replace(/\/$/, '')}/api`;
+  }
+  return '/api';
+}
+
+const API_BASE = getApiBase();
 
 // Get token from localStorage
 const getToken = () => localStorage.getItem('wealthos_token');
@@ -23,20 +32,30 @@ async function apiFetch(endpoint, options = {}) {
   }
   
   const response = await fetch(`${API_BASE}${endpoint}`, config);
-  
+
+  const text = await response.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(
+      response.status === 404
+        ? 'API not found. Set VITE_API_URL in Vercel to your Render backend URL, or add a /api rewrite in vercel.json.'
+        : `Invalid response (${response.status}). Expected JSON from the API server.`
+    );
+  }
+
   if (response.status === 401) {
     localStorage.removeItem('wealthos_token');
     localStorage.removeItem('wealthos_user');
     window.location.href = '/login';
     throw new Error('Unauthorized');
   }
-  
-  const data = await response.json();
-  
+
   if (!response.ok) {
     throw new Error(data.error || 'Request failed');
   }
-  
+
   return data;
 }
 

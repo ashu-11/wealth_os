@@ -4,6 +4,10 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 
+const corsOrigins = process.env.CLIENT_ORIGIN
+  ? process.env.CLIENT_ORIGIN.split(',').map((s) => s.trim())
+  : true;
+
 // Routes
 import authRoutes from './routes/auth.js';
 import customerRoutes from './routes/customers.js';
@@ -15,7 +19,7 @@ import aiRoutes from './routes/ai.js';
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json());
 
