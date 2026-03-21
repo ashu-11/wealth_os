@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment & secrets (never commit real keys)
+.env
+.env.*
+!.env.example
+!client/.env.example
+!server/.env.example
+
+# Build output
+dist/
+build/
+*.local
+
+# Vite
+client/dist/
+client/.vite/
+
+# Logs & debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Misc
+*.pem
+.cache/
