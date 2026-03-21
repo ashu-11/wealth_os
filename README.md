@@ -55,14 +55,6 @@ cd server && npm run seed
 cd .. && npm run dev
 ```
 
-### Test Credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| RM | priya.patel@edelweiss.com | password123 |
-| ASM | arjun.sharma@edelweiss.com | password123 |
-| BM | sanjay.kumar@edelweiss.com | password123 |
-| RSM | rajiv.mehta@edelweiss.com | password123 |
 
 ## Project Structure
 
