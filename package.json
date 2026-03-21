@@ -1,0 +1,20 @@
+{
+  "name": "wealthos",
+  "version": "1.0.0",
+  "description": "WealthOS - RM Dashboard for Edelweiss",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "seed": "cd server && node seeds/index.js",
+    "migrate:seed-data": "cd server && npm run migrate:seed-data",
+    "test": "cd server && npm test"
+  },
+  "keywords": ["wealth-management", "fintech", "dashboard"],
+  "author": "Edelweiss",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

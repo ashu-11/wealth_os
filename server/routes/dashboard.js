@@ -1,0 +1,244 @@
+import express from 'express';
+import Customer from '../models/Customer.js';
+import Alert from '../models/Alert.js';
+import User from '../models/User.js';
+import { authenticate, hierarchyAccess } from '../middleware/auth.js';
+
+const router = express.Router();
+
+router.use(authenticate);
+router.use(hierarchyAccess);
+
+// Get RM dashboard data
+router.get('/rm', async (req, res, next) => {
+  try {
+    const rmId = req.user._id;
+    
+    // Get all customers for this RM
+    const customers = await Customer.find({ rmId, status: 'active' }).lean();
+    
+    // Calculate metrics
+    const totalAum = customers.reduce((sum, c) => sum + (c.totalAum || 0), 0);
+    const totalSip = customers.reduce((sum, c) => sum + (c.totalSipAmount || 0), 0);
+    const customerCount = customers.length;
+    
+    // Churn risk breakdown
+    const churnRiskCounts = {
+      high: customers.filter(c => c.churnRisk === 'high').length,
+      medium: customers.filter(c => c.churnRisk === 'medium').length,
+      low: customers.filter(c => c.churnRisk === 'low').length
+    };
+    
+    // Compliance status
+    const complianceCounts = {
+      compliant: customers.filter(c => c.complianceStatus === 'compliant').length,
+      attention: customers.filter(c => c.complianceStatus === 'attention').length,
+      'non-compliant': customers.filter(c => c.complianceStatus === 'non-compliant').length
+    };
+    
+    // Top at-risk customers
+    const atRiskCustomers = customers
+      .filter(c => c.churnRisk === 'high' || c.churnRisk === 'medium')
+      .sort((a, b) => b.totalAum - a.totalAum)
+      .slice(0, 5)
+      .map(c => ({
+        id: c._id,
+        name: c.name,
+        aum: c.totalAum,
+        churnRisk: c.churnRisk,
+        reasons: c.churnRiskReasons || []
+      }));
+    
+    // Top opportunities (customers with high AUM potential)
+    const opportunities = customers
+      .filter(c => c.churnRisk === 'low' && c.totalAum > 100000)
+      .sort((a, b) => b.totalAum - a.totalAum)
+      .slice(0, 5)
+      .map(c => ({
+        id: c._id,
+        name: c.name,
+        aum: c.totalAum,
+        opportunities: c.aiOpportunities || ['Increase SIP', 'Cross-sell insurance']
+      }));
+    
+    // Active alerts count
+    const alertCount = await Alert.countDocuments({
+      status: 'active',
+      $or: [
+        { targetUserId: rmId },
+        { targetRole: 'RM' },
+        { targetRole: 'ALL' }
+      ]
+    });
+    
+    // Target progress
+    const targetAum = req.user.targetAum || 10000000;
+    const targetSip = req.user.targetSip || 500000;
+    
+    res.json({
+      summary: {
+        totalAum,
+        totalSip,
+        customerCount,
+        alertCount,
+        targetAum,
+        targetSip,
+        aumProgress: Math.min(100, (totalAum / targetAum * 100)).toFixed(1),
+        sipProgress: Math.min(100, (totalSip / targetSip * 100)).toFixed(1)
+      },
+      churnRisk: churnRiskCounts,
+      compliance: complianceCounts,
+      atRiskCustomers,
+      opportunities,
+      recentActivity: [] // Would be populated from activity log
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Get ASM dashboard (team view)
+router.get('/asm', async (req, res, next) => {
+  try {
+    if (req.user.role !== 'ASM' && req.user.role !== 'BM' && req.user.role !== 'RSM' && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    
+    // Get direct reports
+    const teamMembers = await User.find({ managerId: req.user._id, isActive: true }).lean();
+    
+    // Get customer data for each team member
+    const teamData = await Promise.all(teamMembers.map(async (rm) => {
+      const customers = await Customer.find({ rmId: rm._id, status: 'active' }).lean();
+      
+      const totalAum = customers.reduce((sum, c) => sum + (c.totalAum || 0), 0);
+      const totalSip = customers.reduce((sum, c) => sum + (c.totalSipAmount || 0), 0);
+      const churnCount = customers.filter(c => c.churnRisk === 'high').length;
+      
+      return {
+        id: rm._id,
+        name: rm.name,
+        email: rm.email,
+        customerCount: customers.length,
+        totalAum,
+        totalSip,
+        targetAum: rm.targetAum || 10000000,
+        targetPct: Math.min(100, (totalAum / (rm.targetAum || 10000000) * 100)).toFixed(1),
+        churnCount,
+        topAtRisk: customers
+          .filter(c => c.churnRisk === 'high')
+          .sort((a, b) => b.totalAum - a.totalAum)
+          .slice(0, 3)
+          .map(c => ({ id: c._id, name: c.name, aum: c.totalAum }))
+      };
+    }));
+    
+    // Aggregate team totals
+    const teamTotals = {
+      totalAum: teamData.reduce((sum, rm) => sum + rm.totalAum, 0),
+      totalSip: teamData.reduce((sum, rm) => sum + rm.totalSip, 0),
+      totalCustomers: teamData.reduce((sum, rm) => sum + rm.customerCount, 0),
+      totalChurnRisk: teamData.reduce((sum, rm) => sum + rm.churnCount, 0),
+      teamSize: teamData.length
+    };
+    
+    res.json({
+      totals: teamTotals,
+      team: teamData.sort((a, b) => b.totalAum - a.totalAum)
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Get daily actions
+router.get('/actions', async (req, res, next) => {
+  try {
+    const rmQuery = req.accessibleUserIds 
+      ? { rmId: { $in: req.accessibleUserIds } }
+      : {};
+    
+    // Get customers needing action today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Various action triggers
+    const [
+      churnRisk,
+      sipExpiring,
+      noContact30Days,
+      complianceIssues
+    ] = await Promise.all([
+      // High churn risk
+      Customer.find({ ...rmQuery, churnRisk: 'high', status: 'active' })
+        .sort({ totalAum: -1 })
+        .limit(10)
+        .lean(),
+      
+      // SIP expiring in next 7 days (mock - would use actual SIP dates)
+      Customer.find({ ...rmQuery, status: 'active', activeSipCount: { $gt: 0 } })
+        .sort({ totalSipAmount: -1 })
+        .limit(5)
+        .lean(),
+      
+      // No contact in 30 days
+      Customer.find({
+        ...rmQuery,
+        status: 'active',
+        $or: [
+          { lastContactDate: { $lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+          { lastContactDate: null }
+        ]
+      })
+        .sort({ totalAum: -1 })
+        .limit(10)
+        .lean(),
+      
+      // Compliance attention needed
+      Customer.find({ ...rmQuery, complianceStatus: { $ne: 'compliant' }, status: 'active' })
+        .limit(10)
+        .lean()
+    ]);
+    
+    // Format actions with priority
+    const actions = [
+      ...churnRisk.map(c => ({
+        type: 'churn-risk',
+        priority: 'high',
+        customer: { id: c._id, name: c.name, aum: c.totalAum },
+        action: `Call ${c.name} - High churn risk`,
+        aiSuggestion: c.aiCallScript || 'Discuss portfolio performance and address concerns'
+      })),
+      ...complianceIssues.map(c => ({
+        type: 'compliance',
+        priority: 'high',
+        customer: { id: c._id, name: c.name, aum: c.totalAum },
+        action: `Resolve compliance issue for ${c.name}`,
+        aiSuggestion: `Address: ${(c.complianceFlags || []).join(', ')}`
+      })),
+      ...noContact30Days.slice(0, 5).map(c => ({
+        type: 'follow-up',
+        priority: 'medium',
+        customer: { id: c._id, name: c.name, aum: c.totalAum },
+        action: `Follow up with ${c.name} - No contact in 30+ days`,
+        aiSuggestion: 'Check in on portfolio and life goals'
+      }))
+    ];
+    
+    // Sort by AUM impact (priority then AUM)
+    actions.sort((a, b) => {
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      const pDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+      if (pDiff !== 0) return pDiff;
+      return (b.customer.aum || 0) - (a.customer.aum || 0);
+    });
+    
+    res.json(actions);
+  } catch (err) {
+    next(err);
+  }
+});
+
+export default router;
