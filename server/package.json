@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
+    "build": "echo 'wealthos-server: no compile step'",
     "dev": "nodemon start-dev.mjs",
     "dev:server": "nodemon index.js",
     "start": "node index.js",
