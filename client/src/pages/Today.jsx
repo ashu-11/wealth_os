@@ -3,6 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { Card, Pill, Avatar, Spinner, formatINR, formatPct } from '../components/UI';
 import { useFetch, auth } from '../hooks/useFetch';
 
+/** India business calendar — avoids off-by-one “today” when system TZ is UTC and shows full date. */
+const INDIA_TZ = 'Asia/Kolkata';
+
+function formatTodayInIndia() {
+  return new Intl.DateTimeFormat('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: INDIA_TZ,
+  }).format(new Date());
+}
+
+function greetingPeriodInIndia() {
+  const parts = new Intl.DateTimeFormat('en-IN', {
+    timeZone: INDIA_TZ,
+    hour: 'numeric',
+    hour12: false,
+  }).formatToParts(new Date());
+  const hour = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '12', 10);
+  if (hour < 12) return 'morning';
+  if (hour < 17) return 'afternoon';
+  return 'evening';
+}
+
 export default function Today() {
   const navigate = useNavigate();
   const user = auth.getUser();
@@ -30,10 +55,10 @@ export default function Today() {
       {/* Greeting */}
       <div className="px-4 pt-4 pb-2">
         <p className="text-gray-500 text-sm">
-          {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+          {formatTodayInIndia()}
         </p>
         <h2 className="text-xl font-bold text-gray-900">
-          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.name?.split(' ')[0]}
+          Good {greetingPeriodInIndia()}, {user?.name?.split(' ')[0]}
         </h2>
       </div>
       

@@ -5,6 +5,7 @@ import { auth, useFetch } from './hooks/useFetch';
 // Components
 import TopBar from './components/TopBar';
 import BottomNav from './components/BottomNav';
+import DesktopSidebar from './components/DesktopSidebar';
 import AddCustomer from './components/AddCustomer';
 
 // Pages
@@ -60,15 +61,18 @@ function AppLayout({ children }) {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <TopBar 
-        title={getTitleForPath(location.pathname)}
-        showBack={showBack}
-        alertCount={alertCounts?.total || 0}
-      />
-      <main className="pb-safe">
-        {children}
-      </main>
-      <BottomNav onAddClick={() => setShowAddCustomer(true)} />
+      <DesktopSidebar onAddClick={() => setShowAddCustomer(true)} />
+      <div className="md:pl-64 min-h-screen flex flex-col">
+        <TopBar 
+          title={getTitleForPath(location.pathname)}
+          showBack={showBack}
+          alertCount={alertCounts?.total || 0}
+        />
+        <main className="pb-safe flex-1">
+          {children}
+        </main>
+        <BottomNav onAddClick={() => setShowAddCustomer(true)} />
+      </div>
       
       {/* Add Customer Modal */}
       {showAddCustomer && (
@@ -81,71 +85,6 @@ function AppLayout({ children }) {
         />
       )}
     </div>
-  );
-}
-
-// Desktop sidebar (optional enhancement)
-function DesktopSidebar() {
-  const location = useLocation();
-  const user = auth.getUser();
-  
-  const navItems = [
-    { path: '/', label: 'Today', icon: '📅' },
-    { path: '/customers', label: 'Customers', icon: '👥' },
-    { path: '/chat', label: 'AI Chat', icon: '💬' },
-    { path: '/alerts', label: 'Alerts', icon: '🔔' },
-    ...(user?.role !== 'RM' ? [{ path: '/team', label: 'Team', icon: '👥' }] : []),
-    { path: '/more', label: 'More', icon: '☰' }
-  ];
-  
-  return (
-    <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0">
-      {/* Logo */}
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">
-            W
-          </div>
-          <div>
-            <p className="font-bold text-gray-900">WealthOS</p>
-            <p className="text-xs text-gray-500">RM Dashboard</p>
-          </div>
-        </div>
-      </div>
-      
-      {/* Nav */}
-      <nav className="flex-1 p-2 overflow-y-auto">
-        {navItems.map(item => (
-          <a
-            key={item.path}
-            href={item.path}
-            className={`
-              flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors
-              ${location.pathname === item.path 
-                ? 'bg-blue-50 text-blue-700' 
-                : 'text-gray-600 hover:bg-gray-50'
-              }
-            `}
-          >
-            <span className="text-xl">{item.icon}</span>
-            <span className="font-medium">{item.label}</span>
-          </a>
-        ))}
-      </nav>
-      
-      {/* User */}
-      <div className="p-4 border-t border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-            {user?.name?.charAt(0) || '?'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-gray-900 truncate">{user?.name}</p>
-            <p className="text-xs text-gray-500">{user?.role}</p>
-          </div>
-        </div>
-      </div>
-    </aside>
   );
 }
 
