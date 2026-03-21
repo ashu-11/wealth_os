@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://wealth-os-bz8v.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
