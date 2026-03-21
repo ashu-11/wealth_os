@@ -7,12 +7,13 @@ const router = express.Router();
 // Login with email/password
 router.post('/login', async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    
+    const { password } = req.body;
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required' });
     }
-    
+
     const user = await User.findOne({ email }).select('+password');
     
     if (!user) {

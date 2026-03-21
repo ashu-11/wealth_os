@@ -12,6 +12,7 @@
     "dev:server": "nodemon index.js",
     "start": "node index.js",
     "seed": "node seeds/index.js",
+    "seed:html": "node seeds/seedHtmlMock.js",
     "migrate:seed-data": "node scripts/migrateFromSeedData.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },

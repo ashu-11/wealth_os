@@ -1,15 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 
-/** Local dev: Vite proxies /api → backend. Production (Vercel): set VITE_API_URL to your API origin, e.g. https://your-app.onrender.com */
+/**
+ * Local dev: Vite proxies /api → backend.
+ * Production: set VITE_API_URL to the API **origin only** (no `/api` suffix), e.g. https://your-app.onrender.com
+ * If the value already ends with `/api`, we strip it so we never produce `/api/api/...` (404 Not found).
+ */
 function getApiBase() {
   const origin = import.meta.env.VITE_API_URL?.trim();
   if (origin) {
-    return `${origin.replace(/\/$/, '')}/api`;
+    const base = origin.replace(/\/$/, '').replace(/\/api$/i, '');
+    return `${base}/api`;
   }
   return '/api';
 }
 
-const API_BASE = getApiBase();
+export const API_BASE = getApiBase();
 
 // Get token from localStorage
 const getToken = () => localStorage.getItem('wealthos_token');
@@ -83,8 +88,8 @@ export function useAsync(asyncFn, immediate = true) {
     if (immediate) {
       execute();
     }
-  }, []);
-  
+  }, [execute, immediate]);
+
   return { ...state, execute, refetch: execute };
 }
 

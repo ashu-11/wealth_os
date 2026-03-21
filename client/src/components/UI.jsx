@@ -3,14 +3,14 @@ import React from 'react';
 // Pill/Badge component
 export function Pill({ children, variant = 'default', size = 'sm' }) {
   const variants = {
-    default: 'bg-gray-100 text-gray-700',
-    primary: 'bg-blue-100 text-blue-700',
-    success: 'bg-green-100 text-green-700',
-    warning: 'bg-amber-100 text-amber-700',
-    danger: 'bg-red-100 text-red-700',
-    'churn-high': 'bg-red-100 text-red-700',
-    'churn-medium': 'bg-amber-100 text-amber-700',
-    'churn-low': 'bg-green-100 text-green-700'
+    default: 'bg-p2 text-ink-3',
+    primary: 'bg-gold-bg text-gold',
+    success: 'bg-sage-bg text-sage',
+    warning: 'bg-gold-bg text-ember',
+    danger: 'bg-rose-bg text-rose',
+    'churn-high': 'bg-rose-bg text-rose',
+    'churn-medium': 'bg-gold-bg text-ember',
+    'churn-low': 'bg-sage-bg text-sage',
   };
   
   const sizes = {
@@ -29,15 +29,15 @@ export function Pill({ children, variant = 'default', size = 'sm' }) {
 // Allocation row for portfolio display
 export function AllocRow({ label, current, target, color = '#0052CC' }) {
   const diff = current - target;
-  const diffColor = Math.abs(diff) > 5 ? (diff > 0 ? 'text-amber-600' : 'text-red-600') : 'text-gray-500';
+  const diffColor = Math.abs(diff) > 5 ? (diff > 0 ? 'text-ember' : 'text-rose') : 'text-ink-5';
   
   return (
     <div className="flex items-center gap-3 py-2">
       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-      <span className="flex-1 text-sm font-medium text-gray-700">{label}</span>
+      <span className="flex-1 text-sm font-medium text-ink-3">{label}</span>
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold">{current}%</span>
-        <span className="text-xs text-gray-400">/ {target}%</span>
+        <span className="text-xs text-ink-5">/ {target}%</span>
         {diff !== 0 && (
           <span className={`text-xs ${diffColor}`}>
             ({diff > 0 ? '+' : ''}{diff}%)
@@ -52,9 +52,9 @@ export function AllocRow({ label, current, target, color = '#0052CC' }) {
 export function Empty({ icon, title, description, action }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      {icon && <div className="text-4xl mb-4 text-gray-300">{icon}</div>}
-      <h3 className="text-lg font-semibold text-gray-700 mb-1">{title}</h3>
-      {description && <p className="text-sm text-gray-500 mb-4">{description}</p>}
+      {icon && <div className="mb-4 text-4xl text-ink-6">{icon}</div>}
+      <h3 className="mb-1 text-lg font-semibold text-ink-2">{title}</h3>
+      {description && <p className="mb-4 text-sm text-ink-4">{description}</p>}
       {action}
     </div>
   );
@@ -69,14 +69,14 @@ export function Spinner({ size = 'md' }) {
   };
   
   return (
-    <div className={`${sizes[size]} animate-spin rounded-full border-2 border-gray-200 border-t-blue-600`} />
+    <div className={`${sizes[size]} animate-spin rounded-full border-2 border-ink-6 border-t-gold`} />
   );
 }
 
 // Loading skeleton
 export function Skeleton({ className = '' }) {
   return (
-    <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
+    <div className={`animate-pulse rounded bg-ink-6/40 ${className}`} />
   );
 }
 
@@ -84,7 +84,7 @@ export function Skeleton({ className = '' }) {
 export function Card({ children, className = '', onClick }) {
   return (
     <div 
-      className={`bg-white rounded-xl shadow-sm border border-gray-100 ${onClick ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''} ${className}`}
+      className={`rounded-xl border border-ink-6 bg-paper shadow-sm ${onClick ? 'cursor-pointer transition-transform active:scale-[0.99]' : ''} ${className}`}
       onClick={onClick}
     >
       {children}
@@ -95,11 +95,11 @@ export function Card({ children, className = '', onClick }) {
 // Button component
 export function Button({ children, variant = 'primary', size = 'md', disabled, loading, className = '', ...props }) {
   const variants = {
-    primary: 'bg-ew-blue text-white hover:bg-blue-700 active:bg-blue-800',
-    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300',
-    outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100',
-    ghost: 'text-gray-600 hover:bg-gray-100 active:bg-gray-200',
-    danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800'
+    primary: 'bg-ink-1 text-paper hover:bg-ink-2 active:bg-ink-2',
+    secondary: 'bg-p2 text-ink-2 hover:bg-p3 active:bg-p3',
+    outline: 'border border-ink-6 text-ink-2 hover:bg-p2 active:bg-p2',
+    ghost: 'text-ink-3 hover:bg-p2 active:bg-p2',
+    danger: 'bg-rose text-paper hover:opacity-90 active:opacity-90',
   };
   
   const sizes = {
@@ -111,7 +111,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
   return (
     <button
       className={`
-        inline-flex items-center justify-center font-medium rounded-lg transition-colors
+        inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors
         disabled:opacity-50 disabled:cursor-not-allowed
         ${variants[variant]} ${sizes[size]} ${className}
       `}
@@ -145,7 +145,9 @@ export function Avatar({ name, src, size = 'md' }) {
   }
   
   return (
-    <div className={`${sizes[size]} rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-semibold`}>
+    <div
+      className={`${sizes[size]} flex items-center justify-center rounded-full border border-gold-l bg-gold-bg font-semibold text-gold`}
+    >
       {initials}
     </div>
   );
@@ -178,9 +180,9 @@ export function formatPct(value, showSign = false) {
 // Risk indicator
 export function RiskIndicator({ level }) {
   const config = {
-    high: { color: 'bg-red-500', label: 'High Risk' },
-    medium: { color: 'bg-amber-500', label: 'Medium Risk' },
-    low: { color: 'bg-green-500', label: 'Low Risk' }
+    high: { color: 'bg-rose', label: 'High Risk' },
+    medium: { color: 'bg-ember', label: 'Medium Risk' },
+    low: { color: 'bg-sage', label: 'Low Risk' },
   };
   
   const { color, label } = config[level] || config.low;
@@ -188,7 +190,7 @@ export function RiskIndicator({ level }) {
   return (
     <div className="flex items-center gap-1.5">
       <div className={`w-2 h-2 rounded-full ${color}`} />
-      <span className="text-xs text-gray-600">{label}</span>
+      <span className="text-xs text-ink-4">{label}</span>
     </div>
   );
 }
@@ -196,23 +198,23 @@ export function RiskIndicator({ level }) {
 // Tab navigation
 export function Tabs({ tabs, activeTab, onChange }) {
   return (
-    <div className="flex border-b border-gray-200">
+    <div className="flex border-b border-ink-6">
       {tabs.map(tab => (
         <button
           key={tab.id}
           onClick={() => onChange(tab.id)}
           className={`
-            px-4 py-3 text-sm font-medium border-b-2 transition-colors
-            ${activeTab === tab.id 
-              ? 'border-ew-blue text-ew-blue' 
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+            border-b-2 px-4 py-3 text-sm font-medium transition-colors
+            ${activeTab === tab.id
+              ? 'border-gold text-ink-1'
+              : 'border-transparent text-ink-5 hover:text-ink-3'
             }
           `}
         >
           {tab.label}
           {tab.count !== undefined && (
-            <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
-              activeTab === tab.id ? 'bg-blue-100' : 'bg-gray-100'
+            <span className={`ml-2 rounded-full px-1.5 py-0.5 font-mono text-xs ${
+              activeTab === tab.id ? 'bg-gold-bg text-gold' : 'bg-p2 text-ink-4'
             }`}>
               {tab.count}
             </span>

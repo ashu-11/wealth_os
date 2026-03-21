@@ -94,7 +94,12 @@ router.post('/reassign', authorize('ASM', 'BM', 'RSM', 'ADMIN'), async (req, res
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    
+    if (customer.isAsmDirectClient) {
+      return res.status(400).json({
+        error: 'ASM direct-book customers cannot be reassigned via this endpoint'
+      });
+    }
+
     const toRm = await User.findById(toRmId);
     if (!toRm || toRm.role !== 'RM') {
       return res.status(400).json({ error: 'Invalid target RM' });

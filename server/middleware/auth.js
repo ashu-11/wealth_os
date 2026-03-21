@@ -95,7 +95,7 @@ export const hierarchyAccess = async (req, res, next) => {
         req.accessibleUserIds = allInRegion.map(u => u._id);
       }
     }
-    
+
     next();
   } catch (err) {
     next(err);

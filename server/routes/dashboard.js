@@ -3,17 +3,22 @@ import Customer from '../models/Customer.js';
 import Alert from '../models/Alert.js';
 import User from '../models/User.js';
 import { authenticate, hierarchyAccess } from '../middleware/auth.js';
+import { buildHierarchyCustomerFilter } from '../lib/access.js';
 
 const router = express.Router();
 
 router.use(authenticate);
 router.use(hierarchyAccess);
 
-// Get RM dashboard data
+// Get RM dashboard data (RM role only — managers use /dashboard/asm)
 router.get('/rm', async (req, res, next) => {
   try {
+    if (req.user.role !== 'RM') {
+      return res.status(403).json({ error: 'RM dashboard only. Managers should use /dashboard/asm.' });
+    }
+
     const rmId = req.user._id;
-    
+
     // Get all customers for this RM
     const customers = await Customer.find({ rmId, status: 'active' }).lean();
     
@@ -141,10 +146,26 @@ router.get('/asm', async (req, res, next) => {
       totalChurnRisk: teamData.reduce((sum, rm) => sum + rm.churnCount, 0),
       teamSize: teamData.length
     };
-    
+
+    let personalBook = null;
+    if (req.user.role === 'ASM') {
+      const pb = await Customer.find({
+        asmOwnerUserId: req.user._id,
+        isAsmDirectClient: true,
+        status: 'active'
+      }).lean();
+      personalBook = {
+        customerCount: pb.length,
+        totalAum: pb.reduce((s, c) => s + (c.totalAum || 0), 0),
+        totalSip: pb.reduce((s, c) => s + (c.totalSipAmount || 0), 0),
+        churnHigh: pb.filter((c) => c.churnRisk === 'high').length
+      };
+    }
+
     res.json({
       totals: teamTotals,
-      team: teamData.sort((a, b) => b.totalAum - a.totalAum)
+      team: teamData.sort((a, b) => b.totalAum - a.totalAum),
+      personalBook
     });
   } catch (err) {
     next(err);
@@ -154,9 +175,9 @@ router.get('/asm', async (req, res, next) => {
 // Get daily actions
 router.get('/actions', async (req, res, next) => {
   try {
-    const rmQuery = req.accessibleUserIds 
-      ? { rmId: { $in: req.accessibleUserIds } }
-      : {};
+    const rmQuery = req.accessibleUserIds
+      ? { status: 'active', ...buildHierarchyCustomerFilter(req.accessibleUserIds) }
+      : { status: 'active' };
     
     // Get customers needing action today
     const today = new Date();
@@ -172,13 +193,13 @@ router.get('/actions', async (req, res, next) => {
       complianceIssues
     ] = await Promise.all([
       // High churn risk
-      Customer.find({ ...rmQuery, churnRisk: 'high', status: 'active' })
+      Customer.find({ ...rmQuery, churnRisk: 'high' })
         .sort({ totalAum: -1 })
         .limit(10)
         .lean(),
       
       // SIP expiring in next 7 days (mock - would use actual SIP dates)
-      Customer.find({ ...rmQuery, status: 'active', activeSipCount: { $gt: 0 } })
+      Customer.find({ ...rmQuery, activeSipCount: { $gt: 0 } })
         .sort({ totalSipAmount: -1 })
         .limit(5)
         .lean(),
@@ -186,7 +207,6 @@ router.get('/actions', async (req, res, next) => {
       // No contact in 30 days
       Customer.find({
         ...rmQuery,
-        status: 'active',
         $or: [
           { lastContactDate: { $lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
           { lastContactDate: null }
@@ -197,7 +217,7 @@ router.get('/actions', async (req, res, next) => {
         .lean(),
       
       // Compliance attention needed
-      Customer.find({ ...rmQuery, complianceStatus: { $ne: 'compliant' }, status: 'active' })
+      Customer.find({ ...rmQuery, complianceStatus: { $ne: 'compliant' } })
         .limit(10)
         .lean()
     ]);

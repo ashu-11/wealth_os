@@ -22,11 +22,11 @@ const GOAL_TYPES = [
 ];
 
 const RISK_PROFILES = [
-  { id: 'conservative', label: 'Conservative', desc: 'Low risk, stable returns', color: 'bg-green-100 border-green-300' },
-  { id: 'moderately-conservative', label: 'Moderately Conservative', desc: 'Some equity, mostly debt', color: 'bg-lime-100 border-lime-300' },
-  { id: 'moderate', label: 'Moderate', desc: 'Balanced mix', color: 'bg-amber-100 border-amber-300' },
-  { id: 'moderately-aggressive', label: 'Moderately Aggressive', desc: 'Growth focused', color: 'bg-orange-100 border-orange-300' },
-  { id: 'aggressive', label: 'Aggressive', desc: 'Maximum growth potential', color: 'bg-red-100 border-red-300' }
+  { id: 'conservative', label: 'Conservative', desc: 'Low risk, stable returns', color: 'bg-sage-bg border-sage/40' },
+  { id: 'moderately-conservative', label: 'Moderately Conservative', desc: 'Some equity, mostly debt', color: 'bg-gold-bg border-gold/35' },
+  { id: 'moderate', label: 'Moderate', desc: 'Balanced mix', color: 'bg-p2 border-ink-6' },
+  { id: 'moderately-aggressive', label: 'Moderately Aggressive', desc: 'Growth focused', color: 'bg-gold-bg border-ember/40' },
+  { id: 'aggressive', label: 'Aggressive', desc: 'Maximum growth potential', color: 'bg-rose-bg border-rose/40' },
 ];
 
 export default function AddCustomer({ onClose, onSuccess }) {
@@ -92,62 +92,62 @@ export default function AddCustomer({ onClose, onSuccess }) {
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Full Name *</label>
               <input
                 type="text"
                 value={data.name}
                 onChange={(e) => updateData({ name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-ink-6 rounded-lg focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
                 placeholder="Enter full name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Phone Number *</label>
               <input
                 type="tel"
                 value={data.phone}
                 onChange={(e) => updateData({ phone: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-ink-6 rounded-lg focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
                 placeholder="10-digit mobile number"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Email</label>
               <input
                 type="email"
                 value={data.email}
                 onChange={(e) => updateData({ email: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-ink-6 rounded-lg focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
                 placeholder="email@example.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">PAN</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">PAN</label>
               <input
                 type="text"
                 value={data.pan}
                 onChange={(e) => updateData({ pan: e.target.value.toUpperCase() })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                className="w-full px-3 py-2 border border-ink-6 rounded-lg focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25 uppercase"
                 placeholder="ABCDE1234F"
                 maxLength={10}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">Date of Birth</label>
               <input
                 type="date"
                 value={data.dob}
                 onChange={(e) => updateData({ dob: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-ink-6 rounded-lg focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <label className="block text-sm font-medium text-ink-2 mb-1">City</label>
               <input
                 type="text"
                 value={data.address.city}
                 onChange={(e) => updateData({ address: { ...data.address, city: e.target.value } })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-ink-6 rounded-lg focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
                 placeholder="Mumbai"
               />
             </div>
@@ -157,7 +157,7 @@ export default function AddCustomer({ onClose, onSuccess }) {
       case 'goals':
         return (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 mb-4">Select the customer's financial goals:</p>
+            <p className="text-sm text-ink-3 mb-4">Select the customer's financial goals:</p>
             <div className="grid grid-cols-2 gap-3">
               {GOAL_TYPES.map(goal => {
                 const isSelected = data.goals.some(g => g.type === goal.id);
@@ -167,14 +167,13 @@ export default function AddCustomer({ onClose, onSuccess }) {
                     onClick={() => toggleGoal(goal.id)}
                     className={`
                       p-4 rounded-xl border-2 text-left transition-all
-                      ${isSelected 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                      }
+                      ${isSelected
+                        ? 'border-gold bg-gold-bg'
+                        : 'border-ink-6 bg-paper hover:border-ink-5'}
                     `}
                   >
                     <span className="text-2xl">{goal.icon}</span>
-                    <p className="mt-1 text-sm font-medium text-gray-800">{goal.label}</p>
+                    <p className="mt-1 text-sm font-medium text-ink-1">{goal.label}</p>
                   </button>
                 );
               })}
@@ -185,7 +184,7 @@ export default function AddCustomer({ onClose, onSuccess }) {
       case 'risk':
         return (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 mb-4">Select the customer's risk profile:</p>
+            <p className="text-sm text-ink-3 mb-4">Select the customer's risk profile:</p>
             {RISK_PROFILES.map(profile => (
               <button
                 key={profile.id}
@@ -194,12 +193,12 @@ export default function AddCustomer({ onClose, onSuccess }) {
                   w-full p-4 rounded-xl border-2 text-left transition-all
                   ${data.riskProfile === profile.id 
                     ? `${profile.color} border-current` 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
+                    : 'border-ink-6 bg-paper hover:border-ink-5'
                   }
                 `}
               >
-                <p className="font-medium text-gray-800">{profile.label}</p>
-                <p className="text-sm text-gray-600">{profile.desc}</p>
+                <p className="font-medium text-ink-1">{profile.label}</p>
+                <p className="text-sm text-ink-3">{profile.desc}</p>
               </button>
             ))}
           </div>
@@ -208,10 +207,10 @@ export default function AddCustomer({ onClose, onSuccess }) {
       case 'allocation':
         return (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600 mb-4">Set target asset allocation:</p>
+            <p className="text-sm text-ink-3 mb-4">Set target asset allocation:</p>
             {['equity', 'debt', 'hybrid', 'liquid'].map(asset => (
               <div key={asset} className="flex items-center gap-4">
-                <span className="w-20 text-sm font-medium text-gray-700 capitalize">{asset}</span>
+                <span className="w-20 text-sm font-medium text-ink-2 capitalize">{asset}</span>
                 <input
                   type="range"
                   min="0"
@@ -228,11 +227,11 @@ export default function AddCustomer({ onClose, onSuccess }) {
                 <span className="w-12 text-right text-sm font-semibold">{data.targetAllocation[asset]}%</span>
               </div>
             ))}
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">
+            <div className="mt-4 p-3 bg-p2 rounded-lg">
+              <p className="text-sm text-ink-3">
                 Total: {Object.values(data.targetAllocation).reduce((a, b) => a + b, 0)}%
                 {Object.values(data.targetAllocation).reduce((a, b) => a + b, 0) !== 100 && (
-                  <span className="text-amber-600 ml-2">⚠️ Should equal 100%</span>
+                  <span className="ml-2 text-ember">⚠️ Should equal 100%</span>
                 )}
               </p>
             </div>
@@ -242,18 +241,18 @@ export default function AddCustomer({ onClose, onSuccess }) {
       case 'review':
         return (
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-800 mb-2">Customer Details</h4>
-              <p className="text-sm text-gray-600">Name: <span className="font-medium text-gray-800">{data.name || '—'}</span></p>
-              <p className="text-sm text-gray-600">Phone: <span className="font-medium text-gray-800">{data.phone || '—'}</span></p>
-              <p className="text-sm text-gray-600">Email: <span className="font-medium text-gray-800">{data.email || '—'}</span></p>
-              <p className="text-sm text-gray-600">PAN: <span className="font-medium text-gray-800">{data.pan || '—'}</span></p>
+            <div className="p-4 bg-p2 rounded-lg">
+              <h4 className="font-medium text-ink-1 mb-2">Customer Details</h4>
+              <p className="text-sm text-ink-3">Name: <span className="font-medium text-ink-1">{data.name || '—'}</span></p>
+              <p className="text-sm text-ink-3">Phone: <span className="font-medium text-ink-1">{data.phone || '—'}</span></p>
+              <p className="text-sm text-ink-3">Email: <span className="font-medium text-ink-1">{data.email || '—'}</span></p>
+              <p className="text-sm text-ink-3">PAN: <span className="font-medium text-ink-1">{data.pan || '—'}</span></p>
             </div>
             
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-800 mb-2">Goals</h4>
+            <div className="p-4 bg-p2 rounded-lg">
+              <h4 className="font-medium text-ink-1 mb-2">Goals</h4>
               {data.goals.length === 0 ? (
-                <p className="text-sm text-gray-500">No goals selected</p>
+                <p className="text-sm text-ink-4">No goals selected</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {data.goals.map(g => (
@@ -265,13 +264,13 @@ export default function AddCustomer({ onClose, onSuccess }) {
               )}
             </div>
             
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-800 mb-2">Risk Profile</h4>
-              <p className="text-sm text-gray-600">{RISK_PROFILES.find(r => r.id === data.riskProfile)?.label}</p>
+            <div className="p-4 bg-p2 rounded-lg">
+              <h4 className="font-medium text-ink-1 mb-2">Risk Profile</h4>
+              <p className="text-sm text-ink-3">{RISK_PROFILES.find(r => r.id === data.riskProfile)?.label}</p>
             </div>
             
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-800 mb-2">Target Allocation</h4>
+            <div className="p-4 bg-p2 rounded-lg">
+              <h4 className="font-medium text-ink-1 mb-2">Target Allocation</h4>
               <div className="flex gap-2">
                 {Object.entries(data.targetAllocation).map(([k, v]) => (
                   <span key={k} className="px-2 py-1 bg-white rounded text-sm capitalize">
@@ -292,25 +291,25 @@ export default function AddCustomer({ onClose, onSuccess }) {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
       <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden animate-slide-up sm:rounded-xl rounded-t-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between border-b border-ink-6 p-4">
           <h2 className="text-lg font-semibold">Add Customer</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-p2 rounded-lg">
             ✕
           </button>
         </div>
         
         {/* Progress */}
-        <div className="flex items-center gap-1 p-4 bg-gray-50">
+        <div className="flex items-center gap-1 p-4 bg-p2">
           {STEPS.map((s, i) => (
             <React.Fragment key={s.id}>
               <div className={`
                 flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
-                ${i === step ? 'bg-ew-blue text-white' : i < step ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}
+                ${i === step ? 'bg-ink-1 text-paper' : i < step ? 'bg-sage text-paper' : 'bg-ink-6 text-ink-5'}
               `}>
                 {i < step ? '✓' : s.icon}
               </div>
               {i < STEPS.length - 1 && (
-                <div className={`flex-1 h-1 rounded ${i < step ? 'bg-green-500' : 'bg-gray-200'}`} />
+                <div className={`flex-1 h-1 rounded ${i < step ? 'bg-sage' : 'bg-ink-6'}`} />
               )}
             </React.Fragment>
           ))}
@@ -318,7 +317,7 @@ export default function AddCustomer({ onClose, onSuccess }) {
         
         {/* Step title */}
         <div className="px-4 pt-4 pb-2">
-          <h3 className="font-semibold text-gray-800">{STEPS[step].title}</h3>
+          <h3 className="font-semibold text-ink-1">{STEPS[step].title}</h3>
         </div>
         
         {/* Content */}
@@ -327,7 +326,7 @@ export default function AddCustomer({ onClose, onSuccess }) {
         </div>
         
         {/* Footer */}
-        <div className="flex gap-3 p-4 border-t bg-white">
+        <div className="flex gap-3 border-t border-ink-6 bg-paper p-4">
           {step > 0 && (
             <Button variant="secondary" onClick={prevStep} className="flex-1">
               Back

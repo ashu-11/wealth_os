@@ -8,58 +8,57 @@ export default function Customers() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState(searchParams.get('churnRisk') || 'all');
-  
+
   const queryStr = new URLSearchParams({
     ...(search && { search }),
-    ...(filter !== 'all' && { churnRisk: filter })
+    ...(filter !== 'all' && { churnRisk: filter }),
   }).toString();
-  
+
   const { data, loading, refetch } = useFetch(`/customers?${queryStr}`);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => refetch(), 300);
     return () => clearTimeout(timer);
   }, [search, filter]);
-  
+
   const customers = data?.customers || [];
-  
+
   return (
     <div className="pb-20 md:pb-4">
-      {/* Search & Filter */}
-      <div className="sticky top-14 z-20 bg-white border-b border-gray-100 px-4 py-3">
+      <div className="sticky top-14 z-20 border-b border-ink-6 bg-paper/95 px-4 py-3 backdrop-blur-md">
         <div className="flex gap-2">
-          <div className="flex-1 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-5">🔍</span>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search customers..."
-              className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-ink-6 bg-paper py-2 pl-9 pr-4 text-sm text-ink-1 placeholder:text-ink-5 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
             />
           </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+            className="rounded-lg border border-ink-6 bg-paper px-3 py-2 text-sm text-ink-2"
           >
             <option value="all">All</option>
-            <option value="high">🔴 High Risk</option>
-            <option value="medium">🟡 Medium Risk</option>
-            <option value="low">🟢 Low Risk</option>
+            <option value="high">🔴 High risk</option>
+            <option value="medium">🟡 Medium risk</option>
+            <option value="low">🟢 Low risk</option>
           </select>
         </div>
       </div>
-      
-      {/* Results count */}
-      <div className="px-4 py-2 text-sm text-gray-500">
+
+      <div className="px-4 py-2 text-sm text-ink-4">
         {loading ? 'Loading...' : `${customers.length} customers`}
       </div>
-      
-      {/* Customer List */}
-      <div className="px-4 space-y-2">
+
+      <div className="space-y-2 px-4">
         {loading ? (
-          <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+          <div className="flex justify-center py-12">
+            <Spinner size="lg" />
+          </div>
         ) : customers.length === 0 ? (
           <Empty
             icon="👥"
@@ -67,49 +66,50 @@ export default function Customers() {
             description={search ? 'Try a different search term' : 'Add your first customer'}
           />
         ) : (
-          customers.map(customer => (
-            <Card
-              key={customer._id}
-              className="p-4"
-              onClick={() => navigate(`/customers/${customer._id}`)}
-            >
+          customers.map((customer) => (
+            <Card key={customer._id} className="p-4" onClick={() => navigate(`/customers/${customer._id}`)}>
               <div className="flex items-start gap-3">
                 <Avatar name={customer.name} />
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-gray-900 truncate">{customer.name}</p>
+                    <p className="truncate font-semibold text-ink-1">{customer.name}</p>
                     {customer.churnRisk === 'high' && (
-                      <Pill variant="danger" size="xs">At Risk</Pill>
+                      <Pill variant="danger" size="xs">
+                        At risk
+                      </Pill>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 mt-0.5">{customer.phone}</p>
-                  
-                  <div className="flex items-center gap-4 mt-2">
+                  <p className="mt-0.5 text-sm text-ink-4">{customer.phone}</p>
+
+                  <div className="mt-2 flex items-center gap-4">
                     <div>
-                      <p className="text-xs text-gray-400">AUM</p>
-                      <p className="text-sm font-semibold text-gray-900">{formatINR(customer.totalAum, true)}</p>
+                      <p className="text-xs text-ink-5">AUM</p>
+                      <p className="font-mono text-sm font-semibold text-ink-1">{formatINR(customer.totalAum, true)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Risk Profile</p>
-                      <p className="text-sm font-medium text-gray-700 capitalize">{customer.riskProfile}</p>
+                      <p className="text-xs text-ink-5">Risk profile</p>
+                      <p className="text-sm font-medium capitalize text-ink-2">{customer.riskProfile}</p>
                     </div>
                     {customer.totalSip > 0 && (
                       <div>
-                        <p className="text-xs text-gray-400">SIP</p>
-                        <p className="text-sm font-semibold text-green-600">{formatINR(customer.totalSip, true)}/mo</p>
+                        <p className="text-xs text-ink-5">SIP</p>
+                        <p className="font-mono text-sm font-semibold text-sage">
+                          {formatINR(customer.totalSip, true)}/mo
+                        </p>
                       </div>
                     )}
                   </div>
-                  
-                  {/* Compliance status */}
+
                   {customer.complianceStatus === 'attention' && (
                     <div className="mt-2">
-                      <Pill variant="warning" size="xs">⚠️ Compliance attention needed</Pill>
+                      <Pill variant="warning" size="xs">
+                        ⚠️ Compliance attention needed
+                      </Pill>
                     </div>
                   )}
                 </div>
-                
-                <div className="text-gray-400">→</div>
+
+                <div className="text-ink-5">→</div>
               </div>
             </Card>
           ))

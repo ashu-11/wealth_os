@@ -6,54 +6,55 @@ import { auth } from '../hooks/useFetch';
 export default function TopBar({ title, showBack, alertCount = 0 }) {
   const navigate = useNavigate();
   const user = auth.getUser();
-  
+
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-100">
-      <div className="flex items-center justify-between h-14 px-4">
-        {/* Left */}
-        <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-20 border-b border-ink-6 bg-paper/95 backdrop-blur-md">
+      <div className="flex h-14 items-center justify-between px-4">
+        <div className="flex min-w-0 items-center gap-3">
           {showBack ? (
-            <button 
+            <button
+              type="button"
               onClick={() => navigate(-1)}
-              className="p-2 -ml-2 hover:bg-gray-100 rounded-lg"
+              className="-ml-2 flex h-9 w-9 items-center justify-center rounded-full bg-p2 text-ink-3 hover:bg-p3"
+              aria-label="Back"
             >
               ←
             </button>
           ) : (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink-1 font-serif text-xs font-bold text-gold-l">
                 W
               </div>
-              <span className="font-semibold text-gray-900 hidden sm:block">WealthOS</span>
+              <span className="hidden font-serif text-sm font-semibold text-ink-1 sm:block">WealthOS</span>
             </div>
           )}
-          {title && <h1 className="font-semibold text-gray-900">{title}</h1>}
+          {title && <h1 className="truncate font-serif text-lg text-ink-1">{title}</h1>}
         </div>
-        
-        {/* Right */}
-        <div className="flex items-center gap-2">
-          {/* Alerts bell */}
-          <button 
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
             onClick={() => navigate('/alerts')}
-            className="relative p-2 hover:bg-gray-100 rounded-lg"
+            className="relative rounded-lg p-2 text-ink-3 hover:bg-p2"
+            aria-label="Alerts"
           >
             <span className="text-xl">🔔</span>
             {alertCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-ember px-0.5 font-mono text-[10px] font-bold text-paper">
                 {alertCount > 9 ? '9+' : alertCount}
               </span>
             )}
           </button>
-          
-          {/* User menu */}
-          <button 
+
+          <button
+            type="button"
             onClick={() => navigate('/more')}
-            className="flex items-center gap-2 p-1 hover:bg-gray-100 rounded-lg"
+            className="flex items-center gap-2 rounded-lg p-1 hover:bg-p2"
           >
             <Avatar name={user?.name} size="sm" />
-            <div className="hidden sm:block text-left">
-              <p className="text-sm font-medium text-gray-900 leading-tight">{user?.name}</p>
-              <p className="text-xs text-gray-500">{user?.role}</p>
+            <div className="hidden text-left sm:block">
+              <p className="text-sm font-medium leading-tight text-ink-1">{user?.name}</p>
+              <p className="text-xs text-ink-4">{user?.role}</p>
             </div>
           </button>
         </div>

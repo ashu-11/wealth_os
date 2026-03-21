@@ -1,6 +1,9 @@
 import express from 'express';
 import Alert from '../models/Alert.js';
+import Customer from '../models/Customer.js';
+import User from '../models/User.js';
 import { authenticate, hierarchyAccess } from '../middleware/auth.js';
+import { userCanAccessCustomer } from '../lib/access.js';
 
 const router = express.Router();
 
@@ -71,10 +74,23 @@ router.get('/counts', async (req, res, next) => {
       Alert.countDocuments(baseQuery)
     ]);
     
+    const pMap = Object.fromEntries(byPriority.map((p) => [p._id, p.count]));
+    const critical = pMap.critical || 0;
+    const high = pMap.high || 0;
+    const medium = pMap.medium || 0;
+    const low = pMap.low || 0;
+
     res.json({
       total,
-      byType: Object.fromEntries(byType.map(t => [t._id, t.count])),
-      byPriority: Object.fromEntries(byPriority.map(p => [p._id, p.count]))
+      active: total,
+      critical,
+      high,
+      medium,
+      low,
+      /** critical + high — “urgent” line in UI */
+      urgent: critical + high,
+      byType: Object.fromEntries(byType.map((t) => [t._id, t.count])),
+      byPriority: pMap
     });
   } catch (err) {
     next(err);
@@ -163,14 +179,37 @@ router.post('/:id/dismiss', async (req, res, next) => {
   }
 });
 
-// Create alert (admin/system use)
+// Create alert (managers / system — customer must be in hierarchy)
 router.post('/', async (req, res, next) => {
   try {
+    const { customerId, targetUserId } = req.body;
+
+    if (customerId) {
+      const customer = await Customer.findById(customerId);
+      if (!customer) {
+        return res.status(404).json({ error: 'Customer not found' });
+      }
+      if (!userCanAccessCustomer(customer, req.accessibleUserIds)) {
+        return res.status(403).json({ error: 'Access denied for this customer' });
+      }
+    }
+
+    if (targetUserId && req.accessibleUserIds) {
+      const target = await User.findById(targetUserId);
+      if (!target) {
+        return res.status(400).json({ error: 'targetUserId not found' });
+      }
+      const ok = req.accessibleUserIds.some((id) => id.equals(target._id));
+      if (!ok) {
+        return res.status(403).json({ error: 'targetUserId outside your hierarchy' });
+      }
+    }
+
     const alert = await Alert.create({
       ...req.body,
       source: req.body.source || 'manual'
     });
-    
+
     res.status(201).json(alert);
   } catch (err) {
     next(err);
