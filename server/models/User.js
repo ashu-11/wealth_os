@@ -48,7 +48,10 @@ const userSchema = new mongoose.Schema({
   
   // Status
   isActive: { type: Boolean, default: true },
-  lastLogin: Date
+  lastLogin: Date,
+
+  /** Stable key from HTML mock / HR import (e.g. USR_RM_101) — sparse unique */
+  stableUserKey: { type: String, trim: true, unique: true, sparse: true }
 }, {
   timestamps: true,
   collection: 'users'

@@ -2,10 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tokens aligned with wealthos-hierarchy.html / wealthos-mobile.html */
 :root {
-  --ew-blue: #0052CC;
-  --ew-gold: #D4AF37;
-  --ew-dark: #1A1A2E;
+  --paper: #f7f6f2;
+  --p2: #efeee9;
+  --p3: #e5e3dc;
+  --ink-1: #111110;
+  --ink-2: #2a2a28;
+  --ink-3: #545450;
+  --ink-4: #888880;
+  --ink-5: #b4b4ac;
+  --ink-6: #d4d2ca;
+  --gold: #9a7a2e;
+  --gold-l: #c4a050;
+  --gold-bg: #fbf5e8;
+  --sage: #2e6e4a;
+  --sage-bg: #ebf5ee;
+  --rose: #7a2e3c;
+  --rose-bg: #f5ebec;
+  --ember: #7a3e1e;
+  --emb-bg: #f5ede8;
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -14,9 +30,9 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #F5F5F7;
-  color: #1A1A2E;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink-1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -25,75 +41,49 @@ body {
   .safe-bottom {
     padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
   }
-  
+
+  /* Clear fixed mobile tabbar (64px) + safe area */
+  .pb-safe {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 }
 
-/* Animation classes */
-@keyframes slideUp {
+@keyframes fadeIn {
   from {
-    transform: translateY(20px);
     opacity: 0;
+    transform: translateY(4px);
   }
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out forwards;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.2s ease;
 }
 
-.animate-pulse-subtle {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* Glass effect */
-.glass {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Custom scrollbar for desktop */
 @media (min-width: 768px) {
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: var(--ink-6);
     border-radius: 3px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
   }
 }

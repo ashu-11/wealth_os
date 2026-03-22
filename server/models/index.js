@@ -4,3 +4,6 @@ export { default as Alert } from './Alert.js';
 export { default as Rm } from './Rm.js';
 export { default as Transaction } from './Transaction.js';
 export { default as Audit } from './Audit.js';
+export { default as Branch } from './Branch.js';
+export { default as PromptBank } from './PromptBank.js';
+export { default as UiSnapshot } from './UiSnapshot.js';

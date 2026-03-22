@@ -5,11 +5,11 @@ import { useFetch, api } from '../hooks/useFetch';
 import Simulator from '../components/Simulator';
 
 const ALLOCATION_COLORS = {
-  equity: '#3B82F6',
-  debt: '#10B981',
-  hybrid: '#8B5CF6',
-  liquid: '#F59E0B',
-  other: '#6B7280'
+  equity: '#2E6E4A',
+  debt: '#545450',
+  hybrid: '#9A7A2E',
+  liquid: '#C4A050',
+  other: '#888880',
 };
 
 export default function CustomerDetail() {
@@ -67,7 +67,7 @@ export default function CustomerDetail() {
   if (!customer) {
     return (
       <div className="p-4 text-center">
-        <p className="text-gray-500">Customer not found</p>
+        <p className="text-ink-4">Customer not found</p>
         <Button onClick={() => navigate('/customers')} className="mt-4">Back to Customers</Button>
       </div>
     );
@@ -79,11 +79,11 @@ export default function CustomerDetail() {
   return (
     <div className="pb-20 md:pb-4">
       {/* Header Card */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 pt-4 pb-6">
+      <div className="border-b border-white/10 bg-ink-1 px-4 pb-6 pt-4 text-paper">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-xl font-bold">{customer.name}</h1>
-            <p className="text-blue-100 text-sm mt-0.5">{customer.phone}</p>
+            <h1 className="font-serif text-xl font-semibold">{customer.name}</h1>
+            <p className="mt-0.5 text-sm text-white/70">{customer.phone}</p>
           </div>
           <div className="flex gap-1">
             {customer.churnRisk === 'high' && (
@@ -95,18 +95,18 @@ export default function CustomerDetail() {
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-4 mt-4">
+        <div className="mt-4 grid grid-cols-3 gap-4">
           <div>
-            <p className="text-blue-200 text-xs">Total AUM</p>
-            <p className="text-xl font-bold">{formatINR(customer.totalAum, true)}</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-white/45">Total AUM</p>
+            <p className="font-mono text-xl font-semibold">{formatINR(customer.totalAum, true)}</p>
           </div>
           <div>
-            <p className="text-blue-200 text-xs">Monthly SIP</p>
-            <p className="text-xl font-bold">{formatINR(customer.totalSip, true)}</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-white/45">Monthly SIP</p>
+            <p className="font-mono text-xl font-semibold">{formatINR(customer.totalSip, true)}</p>
           </div>
           <div>
-            <p className="text-blue-200 text-xs">Risk Profile</p>
-            <p className="text-xl font-bold capitalize">{customer.riskProfile}</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-white/45">Risk profile</p>
+            <p className="text-xl font-semibold capitalize">{customer.riskProfile}</p>
           </div>
         </div>
       </div>
@@ -114,16 +114,16 @@ export default function CustomerDetail() {
       {/* AI Brief Card */}
       {brief && (
         <div className="px-4 -mt-4">
-          <Card className="p-4 border-l-4 border-blue-500">
+          <Card className="border-l-4 border-gold p-4">
             <div className="flex items-start gap-2">
               <span className="text-lg">🤖</span>
               <div className="flex-1">
-                <p className="font-semibold text-gray-900 text-sm">AI Pre-Call Brief</p>
-                <p className="text-sm text-gray-600 mt-1">{brief.brief}</p>
+                <p className="text-sm font-semibold text-ink-1">AI pre-call brief</p>
+                <p className="mt-1 text-sm text-ink-3">{brief.brief}</p>
                 {brief.callScript && (
                   <details className="mt-2">
-                    <summary className="text-xs text-blue-600 cursor-pointer">View call script</summary>
-                    <p className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">{brief.callScript}</p>
+                    <summary className="cursor-pointer text-xs text-gold">View call script</summary>
+                    <p className="mt-2 rounded bg-p2 p-2 text-sm text-ink-3">{brief.callScript}</p>
                   </details>
                 )}
                 {brief.opportunities?.length > 0 && (
@@ -173,7 +173,7 @@ export default function CustomerDetail() {
           <div className="space-y-4">
             {/* Allocation */}
             <Card className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Asset Allocation</h3>
+              <h3 className="font-semibold text-ink-1 mb-3">Asset Allocation</h3>
               <div className="space-y-1">
                 {['equity', 'debt', 'hybrid', 'liquid', 'other'].map(asset => {
                   const current = allocation[asset] || 0;
@@ -194,30 +194,30 @@ export default function CustomerDetail() {
             
             {/* Customer Info */}
             <Card className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Customer Details</h3>
+              <h3 className="font-semibold text-ink-1 mb-3">Customer Details</h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-gray-500">Email</p>
+                  <p className="text-ink-4">Email</p>
                   <p className="font-medium">{customer.email || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">PAN</p>
+                  <p className="text-ink-4">PAN</p>
                   <p className="font-medium">{customer.pan || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">DOB</p>
+                  <p className="text-ink-4">DOB</p>
                   <p className="font-medium">{customer.dob ? new Date(customer.dob).toLocaleDateString() : '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">City</p>
+                  <p className="text-ink-4">City</p>
                   <p className="font-medium">{customer.address?.city || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Onboarded</p>
+                  <p className="text-ink-4">Onboarded</p>
                   <p className="font-medium">{new Date(customer.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Last Contact</p>
+                  <p className="text-ink-4">Last Contact</p>
                   <p className="font-medium">
                     {customer.lastContactDate 
                       ? new Date(customer.lastContactDate).toLocaleDateString() 
@@ -229,12 +229,12 @@ export default function CustomerDetail() {
             
             {/* Log Note */}
             <Card className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">📝 Log a Note</h3>
+              <h3 className="font-semibold text-ink-1 mb-3">📝 Log a Note</h3>
               <textarea
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder="Add a quick note about this customer..."
-                className="w-full p-3 border border-gray-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-ink-6 rounded-lg text-sm resize-none focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25"
                 rows={3}
               />
               <Button 
@@ -255,30 +255,30 @@ export default function CustomerDetail() {
           <div className="space-y-3">
             {(!customer.holdings || customer.holdings.length === 0) ? (
               <Card className="p-6 text-center">
-                <p className="text-gray-500">No holdings recorded</p>
+                <p className="text-ink-4">No holdings recorded</p>
               </Card>
             ) : (
               customer.holdings.map((holding, i) => (
                 <Card key={i} className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-gray-900">{holding.schemeName}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{holding.amc}</p>
+                      <p className="font-medium text-ink-1">{holding.schemeName}</p>
+                      <p className="text-xs text-ink-4 mt-0.5">{holding.amc}</p>
                     </div>
                     <Pill variant="default" size="xs">{holding.category}</Pill>
                   </div>
                   <div className="grid grid-cols-3 gap-2 mt-3 text-sm">
                     <div>
-                      <p className="text-gray-500 text-xs">Current Value</p>
+                      <p className="text-ink-4 text-xs">Current Value</p>
                       <p className="font-semibold">{formatINR(holding.currentValue, true)}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Invested</p>
+                      <p className="text-ink-4 text-xs">Invested</p>
                       <p className="font-medium">{formatINR(holding.investedValue, true)}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Returns</p>
-                      <p className={`font-semibold ${holding.returns >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className="text-ink-4 text-xs">Returns</p>
+                      <p className={`font-semibold ${holding.returns >= 0 ? 'text-sage' : 'text-rose'}`}>
                         {formatPct(holding.returns, true)}
                       </p>
                     </div>
@@ -294,20 +294,20 @@ export default function CustomerDetail() {
           <div className="space-y-3">
             {(!customer.goals || customer.goals.length === 0) ? (
               <Card className="p-6 text-center">
-                <p className="text-gray-500">No goals set</p>
+                <p className="text-ink-4">No goals set</p>
               </Card>
             ) : (
               customer.goals.map((goal, i) => (
                 <Card key={i} className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-bg text-xl">
                       {goal.type === 'retirement' ? '🏖️' : 
                        goal.type === 'education' ? '🎓' : 
                        goal.type === 'house' ? '🏠' : '🎯'}
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{goal.name}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-medium text-ink-1">{goal.name}</p>
+                      <p className="text-sm text-ink-4">
                         Target: {formatINR(goal.targetAmount, true)} by {goal.targetYear || '—'}
                       </p>
                     </div>
@@ -317,13 +317,13 @@ export default function CustomerDetail() {
                   </div>
                   {goal.currentValue && (
                     <div className="mt-3">
-                      <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <div className="flex justify-between text-xs text-ink-4 mb-1">
                         <span>Progress</span>
                         <span>{Math.round((goal.currentValue / goal.targetAmount) * 100)}%</span>
                       </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-p2 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                          className="h-full bg-gold"
                           style={{ width: `${Math.min(100, (goal.currentValue / goal.targetAmount) * 100)}%` }}
                         />
                       </div>
@@ -340,30 +340,35 @@ export default function CustomerDetail() {
           <div className="space-y-3">
             {(!commlog || commlog.length === 0) ? (
               <Card className="p-6 text-center">
-                <p className="text-gray-500">No communication history</p>
+                <p className="text-ink-4">No communication history</p>
               </Card>
             ) : (
               commlog.map((log, i) => (
                 <Card key={i} className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      log.type === 'call' ? 'bg-green-100' :
-                      log.type === 'email' ? 'bg-blue-100' :
-                      log.type === 'meeting' ? 'bg-purple-100' :
-                      'bg-gray-100'
-                    }`}>
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                        log.type === 'call'
+                          ? 'bg-sage-bg'
+                          : log.type === 'email'
+                            ? 'bg-gold-bg'
+                            : log.type === 'meeting'
+                              ? 'bg-rose-bg'
+                              : 'bg-p2'
+                      }`}
+                    >
                       {log.type === 'call' ? '📞' :
                        log.type === 'email' ? '📧' :
                        log.type === 'meeting' ? '🤝' : '📝'}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium text-gray-900 text-sm capitalize">{log.type}</p>
-                        <p className="text-xs text-gray-400">
+                        <p className="font-medium text-ink-1 text-sm capitalize">{log.type}</p>
+                        <p className="text-xs text-ink-5">
                           {new Date(log.date).toLocaleDateString()}
                         </p>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{log.summary}</p>
+                      <p className="text-sm text-ink-3 mt-1">{log.summary}</p>
                       {log.outcome && (
                         <Pill variant="default" size="xs" className="mt-2">{log.outcome}</Pill>
                       )}
@@ -380,9 +385,9 @@ export default function CustomerDetail() {
       {showWhatsApp && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
           <Card className="w-full max-w-md animate-slide-up sm:rounded-xl rounded-t-xl">
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between border-b border-ink-6 p-4">
               <h3 className="font-semibold">Send WhatsApp Message</h3>
-              <button onClick={() => setShowWhatsApp(false)} className="p-2 hover:bg-gray-100 rounded-lg">✕</button>
+              <button onClick={() => setShowWhatsApp(false)} className="p-2 hover:bg-p2 rounded-lg">✕</button>
             </div>
             <div className="p-4 space-y-2">
               {[
@@ -395,10 +400,10 @@ export default function CustomerDetail() {
                 <button
                   key={msg.id}
                   onClick={() => sendWhatsApp(msg.id)}
-                  className="w-full p-3 flex items-center gap-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="w-full p-3 flex items-center gap-3 rounded-lg border border-ink-6 hover:bg-p2 transition-colors"
                 >
                   <span className="text-xl">{msg.icon}</span>
-                  <span className="font-medium text-gray-900">{msg.label}</span>
+                  <span className="font-medium text-ink-1">{msg.label}</span>
                 </button>
               ))}
             </div>

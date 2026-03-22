@@ -100,6 +100,14 @@ const customerSchema = new mongoose.Schema({
     other: { type: Number, default: 0 }
   },
   allocationDrift: { type: Number, default: 0 },
+
+  /** Optional UI buckets (wealthos-hierarchy.html `alloc` rows) */
+  portfolioSlices: [
+    {
+      name: { type: String, required: true },
+      pct: { type: Number, required: true },
+    },
+  ],
   
   // Holdings
   holdings: [holdingSchema],
@@ -134,12 +142,22 @@ const customerSchema = new mongoose.Schema({
   },
   complianceFlags: [String],
   
-  // RM Assignment
+  // RM Assignment (optional when ASM-owned direct book)
   rmId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: function () {
+      return !this.isAsmDirectClient;
+    }
   },
+  /** ASM personal-book clients (no servicing RM in mock) */
+  isAsmDirectClient: { type: Boolean, default: false },
+  asmOwnerUserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  /** wealthos-hierarchy.html customers[].id */
+  htmlId: { type: Number, sparse: true, unique: true },
   assignedDate: { type: Date, default: Date.now },
   
   // Communication
@@ -174,6 +192,7 @@ const customerSchema = new mongoose.Schema({
 
 // Indexes
 customerSchema.index({ rmId: 1 });
+customerSchema.index({ asmOwnerUserId: 1, isAsmDirectClient: 1 });
 customerSchema.index({ phone: 1 });
 customerSchema.index({ pan: 1 });
 customerSchema.index({ status: 1 });

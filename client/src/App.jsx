@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { auth, useFetch } from './hooks/useFetch';
 
@@ -6,6 +6,7 @@ import { auth, useFetch } from './hooks/useFetch';
 import TopBar from './components/TopBar';
 import BottomNav from './components/BottomNav';
 import DesktopSidebar from './components/DesktopSidebar';
+import RmShellTitleBar from './components/RmShellTitleBar';
 import AddCustomer from './components/AddCustomer';
 
 // Pages
@@ -17,6 +18,22 @@ import AIChat from './pages/AIChat';
 import Alerts from './pages/Alerts';
 import Team from './pages/Team';
 import More from './pages/More';
+import Transactions from './pages/Transactions';
+import AuditCompliance from './pages/AuditCompliance';
+
+function EmptyIndex() {
+  return null;
+}
+
+/** Dashboard shell: three-column Today layout (RM + managers; nav opens third column on desktop) */
+const DASHBOARD_SHELL_ROLES = ['RM', 'ASM', 'BM', 'RSM', 'ADMIN'];
+
+function useRmShell() {
+  const location = useLocation();
+  const user = auth.getUser();
+  const shellPaths = ['/', '/chat', '/alerts', '/transactions', '/audit', '/more'];
+  return DASHBOARD_SHELL_ROLES.includes(user?.role) && shellPaths.includes(location.pathname);
+}
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -33,6 +50,7 @@ function ProtectedRoute({ children }) {
 function AppLayout({ children }) {
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const location = useLocation();
+  const isRmShell = useRmShell();
   
   // Fetch alert counts for the bell icon
   const { data: alertCounts } = useFetch('/alerts/counts');
@@ -48,6 +66,8 @@ function AppLayout({ children }) {
     if (path === '/chat') return 'AI Assistant';
     if (path === '/alerts') return null;
     if (path === '/team') return null;
+    if (path === '/transactions') return 'Transactions';
+    if (path === '/audit') return 'Audit & Compliance';
     if (path === '/more') return 'More';
     return null;
   };
@@ -60,15 +80,40 @@ function AppLayout({ children }) {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DesktopSidebar onAddClick={() => setShowAddCustomer(true)} />
-      <div className="md:pl-64 min-h-screen flex flex-col">
-        <TopBar 
-          title={getTitleForPath(location.pathname)}
-          showBack={showBack}
-          alertCount={alertCounts?.total || 0}
-        />
-        <main className="pb-safe flex-1">
+    <div
+      className={`min-h-screen ${isRmShell ? 'bg-cream md:flex md:h-[100dvh] md:flex-col md:overflow-hidden' : 'bg-p3'}`}
+    >
+      {isRmShell && (
+        <div className="hidden shrink-0 md:block">
+          <RmShellTitleBar />
+        </div>
+      )}
+      <DesktopSidebar
+        onAddClick={() => setShowAddCustomer(true)}
+        alertCount={alertCounts?.total || 0}
+        hasShellHeader={isRmShell}
+      />
+      <div
+        className={`flex min-h-screen flex-col md:pl-14 ${isRmShell ? 'md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden' : ''}`}
+      >
+        {isRmShell ? (
+          <div className="md:hidden">
+            <TopBar
+              title={getTitleForPath(location.pathname)}
+              showBack={showBack}
+              alertCount={alertCounts?.total || 0}
+            />
+          </div>
+        ) : (
+          <TopBar
+            title={getTitleForPath(location.pathname)}
+            showBack={showBack}
+            alertCount={alertCounts?.total || 0}
+          />
+        )}
+        <main
+          className={`flex flex-1 flex-col ${isRmShell ? 'min-h-0 overflow-x-hidden pb-safe md:overflow-hidden md:pb-0' : 'pb-safe md:pb-4'}`}
+        >
           {children}
         </main>
         <BottomNav onAddClick={() => setShowAddCustomer(true)} />
@@ -100,14 +145,18 @@ export default function App() {
             <ProtectedRoute>
               <AppLayout>
                 <Routes>
-                  <Route path="/" element={<Today />} />
                   <Route path="/customers" element={<Customers />} />
                   <Route path="/customers/:id" element={<CustomerDetail />} />
-                  <Route path="/chat" element={<AIChat />} />
-                  <Route path="/alerts" element={<Alerts />} />
                   <Route path="/team" element={<Team />} />
                   <Route path="/team/:id" element={<Team />} />
-                  <Route path="/more" element={<More />} />
+                  <Route element={<Today />}>
+                    <Route index element={<EmptyIndex />} />
+                    <Route path="chat" element={<AIChat />} />
+                    <Route path="alerts" element={<Alerts />} />
+                    <Route path="transactions" element={<Transactions />} />
+                    <Route path="audit" element={<AuditCompliance />} />
+                    <Route path="more" element={<More />} />
+                  </Route>
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </AppLayout>

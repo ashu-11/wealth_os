@@ -15,6 +15,10 @@ import alertRoutes from './routes/alerts.js';
 import dashboardRoutes from './routes/dashboard.js';
 import teamRoutes from './routes/team.js';
 import aiRoutes from './routes/ai.js';
+import auditRoutes from './routes/audits.js';
+import transactionRoutes from './routes/transactions.js';
+import branchRoutes from './routes/branches.js';
+import referenceRoutes from './routes/reference.js';
 
 const app = express();
 
@@ -35,6 +39,10 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/audits', auditRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/branches', branchRoutes);
+app.use('/api/reference', referenceRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
