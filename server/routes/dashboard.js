@@ -4,6 +4,11 @@ import Alert from '../models/Alert.js';
 import User from '../models/User.js';
 import { authenticate, hierarchyAccess } from '../middleware/auth.js';
 import { buildHierarchyCustomerFilter } from '../lib/access.js';
+import { getTeamRmsForDashboard } from '../lib/managerTeam.js';
+import { buildTeamRmDetailPayload } from '../lib/teamRmDetail.js';
+import { buildBmDashboardPayload } from '../lib/bmDashboard.js';
+import { buildTeamAsmDetailPayload } from '../lib/teamAsmDetail.js';
+import { buildRsmRegionPayload, buildRsmBranchDetailPayload } from '../lib/rsmDashboard.js';
 
 const router = express.Router();
 
@@ -109,10 +114,9 @@ router.get('/asm', async (req, res, next) => {
       return res.status(403).json({ error: 'Access denied' });
     }
     
-    // Get direct reports
-    const teamMembers = await User.find({ managerId: req.user._id, isActive: true }).lean();
-    
-    // Get customer data for each team member
+    const teamMembers = await getTeamRmsForDashboard(req);
+
+    // Get customer data for each RM
     const teamData = await Promise.all(teamMembers.map(async (rm) => {
       const customers = await Customer.find({ rmId: rm._id, status: 'active' }).lean();
       
@@ -168,6 +172,89 @@ router.get('/asm', async (req, res, next) => {
       personalBook
     });
   } catch (err) {
+    next(err);
+  }
+});
+
+// BM branch home: ASMs under this BM + branch rollups (My ASMs sidebar + KPIs)
+router.get('/bm', async (req, res, next) => {
+  try {
+    if (req.user.role !== 'BM') {
+      return res.status(403).json({ error: 'BM dashboard only' });
+    }
+    const payload = await buildBmDashboardPayload(req);
+    res.json(payload);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// RSM region home: branch list + regional rollups (My Branches sidebar + KPIs)
+router.get('/rsm', async (req, res, next) => {
+  try {
+    if (req.user.role !== 'RSM' && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'RSM dashboard only' });
+    }
+    const payload = await buildRsmRegionPayload(req);
+    res.json(payload);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// RSM: single branch drill-down (center pane when a branch is selected)
+router.get('/rsm-branch/:htmlId', async (req, res, next) => {
+  try {
+    if (req.user.role !== 'RSM' && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'RSM only' });
+    }
+    const payload = await buildRsmBranchDetailPayload(req, req.params.htmlId);
+    res.json(payload);
+  } catch (err) {
+    if (err.code === 'FORBIDDEN') {
+      return res.status(403).json({ error: err.message });
+    }
+    if (err.code === 'NOT_FOUND') {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    next(err);
+  }
+});
+
+// BM: ASM cluster detail (center pane when an ASM is selected)
+router.get('/team-asm/:asmId', async (req, res, next) => {
+  try {
+    if (req.user.role !== 'BM') {
+      return res.status(403).json({ error: 'BM only' });
+    }
+    const payload = await buildTeamAsmDetailPayload(req, req.params.asmId);
+    res.json(payload);
+  } catch (err) {
+    if (err.code === 'ASM_NOT_IN_BRANCH' || err.code === 'FORBIDDEN_ROLE') {
+      return res.status(403).json({ error: err.message });
+    }
+    if (err.code === 'NOT_FOUND') {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    next(err);
+  }
+});
+
+// Manager: full RM book detail (center pane when an RM is selected)
+router.get('/team-rm/:rmId', async (req, res, next) => {
+  try {
+    if (!['ASM', 'BM', 'RSM', 'ADMIN'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const payload = await buildTeamRmDetailPayload(req, req.params.rmId);
+    res.json(payload);
+  } catch (err) {
+    if (err.code === 'RM_NOT_IN_TEAM') {
+      return res.status(403).json({ error: 'RM not in your team' });
+    }
+    if (err.code === 'NOT_FOUND') {
+      return res.status(404).json({ error: 'Not found' });
+    }
     next(err);
   }
 });

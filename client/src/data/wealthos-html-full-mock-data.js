@@ -1383,6 +1383,8 @@ export const rsmBranches = [
     customerCount: 2840,
     complianceFlags: 3,
     netFlowMTD: 124,
+    /** Branch KPI “Team opp today” (Cr) — BM header strip */
+    oppToday: 48,
     targetPct: 72.0,
     status: 'on_target',
     av_bg: '#EBF5EE',

@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 /**
  * Normalized branch (BM / RSM rollups). Keeps hierarchy UI off `users` documents.
  * Scales with regionCode + code indexes; optional bmUserId links to User.
+ * RSM “My Branches” list + drill-down can also be driven from `ui_snapshots` (kind: rsm_branch)
+ * seeded from `rsmBranches` in wealthos-html-full-mock-data.js; this collection holds live links (htmlId, regionCode).
  */
 const branchSchema = new mongoose.Schema(
   {

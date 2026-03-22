@@ -25,12 +25,14 @@ function EmptyIndex() {
   return null;
 }
 
-/** RM “shell” routes: three-column Today layout (nav opens third column on desktop) */
+/** Dashboard shell: three-column Today layout (RM + managers; nav opens third column on desktop) */
+const DASHBOARD_SHELL_ROLES = ['RM', 'ASM', 'BM', 'RSM', 'ADMIN'];
+
 function useRmShell() {
   const location = useLocation();
   const user = auth.getUser();
   const shellPaths = ['/', '/chat', '/alerts', '/transactions', '/audit', '/more'];
-  return user?.role === 'RM' && shellPaths.includes(location.pathname);
+  return DASHBOARD_SHELL_ROLES.includes(user?.role) && shellPaths.includes(location.pathname);
 }
 
 // Protected route wrapper

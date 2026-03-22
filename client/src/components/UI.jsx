@@ -158,7 +158,15 @@ export function formatINR(amount, compact = false) {
   if (amount === null || amount === undefined) return '—';
   
   if (compact) {
-    if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+    if (amount >= 10000000) {
+      const cr = amount / 10000000;
+      const isInt = Number.isFinite(cr) && Math.abs(cr - Math.round(cr)) < 1e-6;
+      const formatted = cr.toLocaleString('en-IN', {
+        minimumFractionDigits: isInt ? 0 : 1,
+        maximumFractionDigits: isInt ? 0 : 1,
+      });
+      return `₹${formatted} Cr`;
+    }
     if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
     if (amount >= 1000) return `₹${(amount / 1000).toFixed(1)}K`;
   }

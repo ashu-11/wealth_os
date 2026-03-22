@@ -417,7 +417,39 @@ describe('Dashboard Routes', () => {
     
     expect(res.status).toBe(403);
   });
-  
+
+  test('GET /api/dashboard/bm returns ASMs for BM', async () => {
+    const res = await request(app)
+      .get('/api/dashboard/bm')
+      .set('Authorization', `Bearer ${bmToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.totals).toBeDefined();
+    expect(Array.isArray(res.body.asms)).toBe(true);
+    expect(res.body.asms.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.asms[0].rmCount).toBeGreaterThanOrEqual(1);
+  });
+
+  test('GET /api/dashboard/bm denied for ASM', async () => {
+    const res = await request(app)
+      .get('/api/dashboard/bm')
+      .set('Authorization', `Bearer ${asmToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  test('GET /api/dashboard/team-asm/:id returns cluster for BM', async () => {
+    const res = await request(app)
+      .get(`/api/dashboard/team-asm/${asmUser._id}`)
+      .set('Authorization', `Bearer ${bmToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.profile).toBeDefined();
+    expect(res.body.metrics).toBeDefined();
+    expect(Array.isArray(res.body.rms)).toBe(true);
+    expect(res.body.rms.length).toBeGreaterThanOrEqual(1);
+  });
+
   test('GET /api/dashboard/actions returns actions', async () => {
     const res = await request(app)
       .get('/api/dashboard/actions')
